@@ -1,12 +1,16 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 
 import index from "./routes/index";
+import usersRoute from "./routes/usersRoute";
 
 const app = express();
 
-mongoose.connect("mongodb://localhost:27017/cria", {
+mongoose.connect(`${process.env.MONGODB_URL}`, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   useFindAndModify: false,
@@ -33,5 +37,6 @@ app.use(function (req, res, next) {
 });
 
 app.use("/", index);
+app.use("/api/users", usersRoute);
 
 export default app;
