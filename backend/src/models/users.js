@@ -9,26 +9,25 @@ const usersSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      require: true,
+      required: true,
     },
     phone: {
       type: String,
-      require: true,
+      required: true,
     },
     email: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
     },
     password: {
       type: String,
-      require: true,
+      required: true,
     },
     userType: {
       type: String,
       enum: ["admin", "user"],
       default: "user",
-      required: true,
     },
     status: {
       type: String,
