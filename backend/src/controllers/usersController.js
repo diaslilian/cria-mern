@@ -4,8 +4,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const SECRET = process.env.SECRET;
 
+const encryptPassword = (password) => {
+  return bcrypt.hashSync(password, 10);
+};
+
 const registerUser = (request, response) => {
-  const hashingPassword = bcrypt.hashSync(request.body.password, 10);
+  const hashingPassword = encryptPassword(request.body.password);
   request.body.password = hashingPassword;
 
   const user = new users(request.body);
@@ -36,9 +40,11 @@ const loginUser = (request, response) => {
       return response.status(403).send({ message: "Invalid password" });
     }
 
-    const token = jwt.sign({ email: request.body.email }, SECRET);
+    const token = jwt.sign({ id: user.id }, SECRET);
 
-    return response.status(200).send(token);
+    return response
+      .status(200)
+      .send({ token, userType: user.userType, id: user.id });
   });
 };
 
@@ -51,15 +57,33 @@ const getUsers = (request, response) => {
   });
 };
 
-const updateUser = (request, response) => {
-  const _id = request.params.id;
-  const userType = request.body.userType;
+const getUserById = (request, response) => {
+  const id = request.params.id;
 
-  if (userType !== "admin") {
+  users.findById(id, (erro, user) => {
+    if (erro) {
+      return response.status(424).send({ message: erro.message });
+    }
+    return response.status(200).send(user);
+  });
+};
+
+const updateUser = async (request, response) => {
+  const _id = request.params.id;
+
+  const data = request.body;
+
+  const userAuthenticaded = await users.findById(request.userId);
+
+  if (userAuthenticaded.userType !== "admin") {
     return response.status(401).send({
       success: false,
       mensagem: "You do not have permissions.",
     });
+  }
+
+  if (data.password) {
+    data.password = encryptPassword(request.body.password);
   }
 
   users
@@ -92,11 +116,13 @@ const updateUser = (request, response) => {
 const updatePassword = (request, response) => {
   const _id = request.params.id;
 
+  const password = encryptPassword(request.body.password);
+
   users
     .findOneAndUpdate(
       { _id },
       {
-        $set: { password: request.body.password },
+        $set: { password },
       }
     )
     .then((updatedPassword) => {
@@ -140,6 +166,7 @@ export default {
   registerUser,
   loginUser,
   getUsers,
+  getUserById,
   updateUser,
   updatePassword,
   deleteUser,

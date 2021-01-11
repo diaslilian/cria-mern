@@ -5,6 +5,7 @@ import Route from './Route';
 import SignIn from '../screens/SignIn';
 import SignUp from '../screens/SignUp';
 import Dashboard from '../screens/Dashboard';
+import Update from '../screens/Update';
 
 export default function Routes() {
   return (
@@ -12,7 +13,8 @@ export default function Routes() {
       <Switch>
         <Route path="/" exact component={SignIn} />
         <Route path="/register" component={SignUp} />
-        <Route path="/dashboard" component={Dashboard} isPrivate />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/update/:id" component={Update} />
       </Switch>
     </BrowserRouter>
   );

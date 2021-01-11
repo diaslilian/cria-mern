@@ -10,6 +10,7 @@ router.post("/login", controller.loginUser);
 router.use(authMiddleware);
 
 router.get("/info", controller.getUsers);
+router.get("/info/:id", controller.getUserById);
 
 router.put("/update/:id", controller.updateUser);
 router.put("/update-password/:id", controller.updatePassword);

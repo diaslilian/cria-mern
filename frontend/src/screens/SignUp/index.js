@@ -1,7 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { Form, Input, Select } from '@rocketseat/unform';
 import * as Yup from 'yup';
+
+import api from '../../services/api';
 
 import { Container, Group, Option } from './styles';
 
@@ -22,28 +24,76 @@ const options = [
 ];
 
 function SignUp() {
-  function handleSubmit(data) {
-    console.tron.log(data);
+  const [userType, setUserType] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const history = useHistory();
+
+  async function handleRegister() {
+    const data = {
+      name,
+      phone,
+      email,
+      password,
+      userType,
+    };
+
+    try {
+      await api.post('api/users/register', data);
+      alert(`Seu cadastro foi concluido com sucesso`);
+
+      history.push('/');
+    } catch (erro) {
+      alert('Erro no cadastro, tente novamente');
+    }
   }
 
   return (
     <Container>
       <h1>CADASTRO</h1>
 
-      <Form schema={schema} onSubmit={handleSubmit}>
+      <Form schema={schema} onSubmit={handleRegister}>
         <Option>
           <h2>Tipo de perfil</h2>
-          <Select name="userType" id="userType" options={options} />
+          <Select
+            name="userType"
+            id="userType"
+            options={options}
+            value={userType}
+            onChange={(event) => setUserType(event.target.value)}
+          />
         </Option>
 
-        <Input type="name" name="name" placeholder="Seu Nome" />
-        <Input type="phone" name="phone" placeholder="Número de telefone" />
-        <Input type="email" name="email" placeholder="Seu email" />
-        <Input type="password" name="password" placeholder="Sua senha" />
+        <Input
+          type="name"
+          name="name"
+          placeholder="Seu Nome"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+        <Input
+          type="phone"
+          name="phone"
+          placeholder="Número de telefone"
+          value={phone}
+          onChange={(event) => setPhone(event.target.value)}
+        />
+        <Input
+          type="email"
+          name="email"
+          placeholder="Seu email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
         <Input
           type="password"
           name="password"
-          placeholder="Confirme sua senha"
+          placeholder="Sua senha"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
         />
         <Group>
           <Link to="/">Já tem conta?</Link>

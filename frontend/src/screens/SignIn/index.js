@@ -1,10 +1,10 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { Form, Input } from '@rocketseat/unform';
 import * as Yup from 'yup';
 
-import { signInRequest } from '../../store/modules/auth/actions';
+import api from '../../services/api';
+import { login } from '../../services/auth';
 
 import { Container, Group, Wrapper } from './styles';
 
@@ -16,19 +16,47 @@ const schema = Yup.object().shape({
 });
 
 function SignIn() {
-  const dispatch = useDispatch();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  function handleSubmit({ email, password }) {
-    dispatch(signInRequest(email, password));
+  const history = useHistory();
+
+  async function handleLogin() {
+    try {
+      const response = await api.post('api/users/login', { email, password });
+
+      login(response.data.token);
+
+      if (response.data.userType !== 'admin') {
+        history.push(`/update/${response.data.id}`);
+        return;
+      }
+
+      history.push('/dashboard');
+    } catch (erro) {
+      alert('Falha no login, tente novamente');
+    }
   }
 
   return (
     <Container>
       <h1>LOGIN</h1>
 
-      <Form schema={schema} onSubmit={handleSubmit}>
-        <Input type="email" name="email" placeholder="seuemail@mail.com" />
-        <Input type="password" name="password" placeholder="********" />
+      <Form schema={schema} onSubmit={handleLogin}>
+        <Input
+          type="email"
+          name="email"
+          placeholder="seuemail@mail.com"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <Input
+          type="password"
+          name="password"
+          placeholder="********"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
 
         <Group>
           <p>Esqueceu sua senha?</p>

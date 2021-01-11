@@ -1,33 +1,39 @@
 import React from 'react';
-// import { MdEdit, MdDeleteForever } from 'react-icons/md';
+import { useHistory } from 'react-router-dom';
 
-import { Container, Title, SubTitle, Button, Table } from './styles';
+import Table from '../../components/Table';
+
+import { Container, Title, SubTitle, Button } from './styles';
 
 function Dashboard() {
+  const history = useHistory();
+
+  const head = {
+    name: 'Nome',
+    phone: 'Telefone',
+    email: 'Email',
+    userType: 'Perfil',
+    status: 'Ativo',
+    inactivityDate: 'Data de inativação',
+    action: 'Ação',
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+
+    history.push('/');
+  };
+
   return (
     <Container>
-      <Title>Lilian Dias</Title>
+      <Title>Dashboard</Title>
       <SubTitle>ADMIN</SubTitle>
 
-      <Button type="submit" className="secondary-button">
+      <Button onClick={handleLogout} type="submit" className="secondary-button">
         Sair
       </Button>
 
-      <Table id="tabela-lista">
-        <thead>
-          <tr>
-            <th>NOME</th>
-            <th>TELEFONE</th>
-            <th>EMAIL</th>
-            <th>PERFIL</th>
-            <th>STATUS</th>
-            <th>DATA DE INATIVAÇÃO</th>
-            <th>AÇÃO</th>
-          </tr>
-        </thead>
-
-        <tbody id="tabela-lista-corpo" />
-      </Table>
+      <Table head={head} />
     </Container>
   );
 }
